@@ -1,0 +1,214 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+#container {
+    display: flex;
+    height: 100%;
+}
+
+#sidePanel {
+    width: 300px;
+    background: #f4f4f4;
+    overflow-y: auto;
+    border-right: 1px solid #ccc;
+    padding: 10px;
+    position: relative;
+}
+
+#viewDiv {
+    flex: 1;
+}
+
+.accordion {
+    cursor: pointer;
+    border: none;
+    text-align: left;
+    font-size: 15px;
+}
+
+.layer-item {
+    margin: 5px 0;
+    cursor: pointer;
+    color: #0079c1;
+}
+
+.layer-item:hover {
+    text-decoration: underline;
+}
+
+#tooltip {
+    position: absolute;
+    background: #FFF;
+    color: #000;
+    padding: 18px 25px;
+    border-radius: 4px;
+    font-size: 14px;
+    pointer-events: none;
+    display: none;
+    z-index: 1000;
+    white-space: nowrap;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2)
+}
+
+.esri-attribution {
+    display: none;
+}
+
+
+.esri-legend__service {
+    padding: 0px;
+    background-color: transparent;
+}
+
+.esri-widget {
+    padding: 0px;
+    background-color: transparent;
+}
+
+#layerList {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.layer_item {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    justify-content: left;
+    margin-bottom: 8px;
+}
+
+.layer_item .layer-symbol {
+    flex: 0 0 auto;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.layer_item .layer-symbol img {
+
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.layer_item .layer_title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: none;
+
+}
+
+.customPopup {
+    position: absolute;
+    background: #FFF;
+    border: 1px solid #fff;
+    min-height: 200px;
+    min-width: 200px;
+    font-family: Arial;
+    font-size: 13px;
+    z-index: 1000;
+    display: none;
+    margin:0px;
+    padding: 0px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.customPopup .popup_title {
+    padding: 8px 24px;
+    background-color: #415464;
+    min-height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: right;
+}
+
+.customPopup .popup_content {
+    padding: 12px;
+}
+
+#popupClose {
+    cursor: pointer;
+    float: right;
+    color:#FFF;
+}
+
+/*------------Accordion -------------------------*/
+
+.accordion__item {
+    margin: 5px auto;
+}
+
+.accordion__item .accordion__title {
+    position: relative;
+    display: flex;
+    gap: 6px;
+    flex-direction: row;
+    padding: 20px 12px;
+    margin-bottom: 2px;
+    color: white;
+    font-size: 28px;
+    text-decoration: none;
+    background-color: #415464;
+    border-radius: 3px;
+    -webkit-transition: background-color 0.2s;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.accordion__item .accordion__title:hover {
+    background-color: #002247;
+    transition: all 0.5s ease-out;
+}
+
+.accordion__item .accordion-active {
+    background-color: #002247;
+}
+
+.accordion__item .accordion__title .accordion__arrow {
+    position: absolute;
+    top: 13px;
+    right: 10px;
+    display: inline-block;
+    vertical-align: middle;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    color: #fff;
+    line-height: 30px;
+    font-size: 20px;
+    font-weight: 700;
+    margin-right: 5px;
+    background-color: #c9c9c9;
+    border-radius: 50%;
+    -webkit-transition: all 0.2s ease-out;
+    transition: all 0.2s ease-out;
+}
+
+.accordion__item .accordion__rotate {
+    transform: rotate(225deg);
+}
+
+.accordion__item .accordion__content {
+    padding: 8px 20px;
+    margin-bottom: 2px;
+    font-size: 14px;
+    display: none;
+}
+
+.accordion__item .accordion__arrow-item {
+    font-weight: 700;
+}
+
+/*-------------------------------------*/
