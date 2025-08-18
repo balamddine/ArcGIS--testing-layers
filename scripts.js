@@ -43,6 +43,15 @@ mapInit = () => {
             container: "viewDiv",
             map: webmap
         });
+        view.on("pointer-move", async (event) => {
+            const hit = await view.hitTest(event); // check what's under the pointer
+            if (hit.results.length > 0) {
+                const graphic = hit.results[0].graphic;
+                view.container.style.cursor = graphic.layer ? "pointer" : "default";
+            } else {
+                view.container.style.cursor = "default";
+            }
+        });
 
 
 
@@ -147,6 +156,7 @@ mapInit = () => {
             view.hitTest(event).then(function (response) {
                 if (response.results.length) {
                     const graphic = response.results[0].graphic;
+                    if (!graphic.layer) return;
                     const layerName = graphic.layer.title || "Layer";
                     const attributes = graphic.attributes || {};
 
