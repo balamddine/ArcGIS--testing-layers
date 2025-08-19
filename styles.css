@@ -143,7 +143,9 @@ body {
     float: right;
     color:#FFF;
 }
-
+calcite-action-bar{
+    display: none;
+}
 /*------------Accordion -------------------------*/
 
 .accordion__item {

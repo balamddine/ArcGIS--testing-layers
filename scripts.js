@@ -153,66 +153,76 @@ mapInit = () => {
 
         // Custom popup logic using absolute div
         view.on("click", function (event) {
-            view.hitTest(event).then(function (response) {
+            view.hitTest(event).then(async function (response) {
                 if (response.results.length) {
+
                     const graphic = response.results[0].graphic;
                     if (!graphic.layer) return;
-                    const layerName = graphic.layer.title || "Layer";
-                    const attributes = graphic.attributes || {};
+                    const layer = graphic.layer;
+                    const layerName = layer.title || "Layer";
 
-                    // Build dynamic HTML
-                    const content = `
-          <h3 style="margin-top:0;">${layerName}</h3>
-         
-        `;
-                    //  ${Object.keys(attributes).map(key => {
-                    //               if (attributes[key] != null && typeof attributes[key] !== "object") {
-                    //                 return `<p><b>${key}:</b> ${attributes[key]}</p>`;
-                    //               } else {
-                    //                 return "";
-                    //               }
-                    //             }).join("")}
-                    const viewDiv = document.getElementById("viewDiv");
+                    const objectIdField = layer.objectIdField;
+                    const objectId = graphic.attributes[objectIdField];
+
+                    // Use queryFeatures to get all attributes for the objectId
+                    const query = layer.createQuery();
+                    query.objectIds = [objectId];
+                    query.outFields = ["*"]; // This will return all fields
+                    const attr_result = await layer.queryFeatures(query);
+                    if (attr_result) {
+                        const feature = attr_result.features[0];
+                        const attributes = feature.attributes;
+                         const tble = renderJSONAsTable(attributes)
+                        view.popup.open({
+                            title: "Feature Information",
+                            location: event.mapPoint, // Position the pop-up at the click location
+                            content: tble // Function to format the pop-up content
+                        });
 
 
-                    // Set popup content
-                    customPopup.querySelector("#popupContent").innerHTML = content;
-
-                    const screenPoint = view.toScreen(event.mapPoint);
-
-                    // Get the position of the view container relative to the page
-                    const viewRect = view.container.getBoundingClientRect();
-
-                    // Calculate popup position relative to the container
-                    const padding = 10;
-                    let left = screenPoint.x + 20;
-                    let top = screenPoint.y + 20;
-
-                    // Adjust for view container position
-                    left += viewRect.left;
-                    top += viewRect.top;
-
-                    // Get popup size
-                    const popupRect = customPopup.getBoundingClientRect();
-
-                    // Prevent overflow within the view container
-                    if (left + popupRect.width + padding > viewRect.right) {
-                        left = viewRect.right - popupRect.width - padding;
-                    }
-                    if (top + popupRect.height + padding > viewRect.bottom) {
-                        top = viewRect.bottom - popupRect.height - padding;
-                    }
-                    if (left < viewRect.left + padding) {
-                        left = viewRect.left + padding;
-                    }
-                    if (top < viewRect.top + padding) {
-                        top = viewRect.top + padding;
+                       
+                        // const content = `
+                        //                 <h3 style="margin-top:0;">${layerName}</h3>
+                        //                 ${tble}
+                        //             `;
+                        // // Set popup content
+                        // customPopup.querySelector("#popupContent").innerHTML = content;
                     }
 
-                    // Apply position
-                    customPopup.style.left = left + "px";
-                    customPopup.style.top = top + "px";
-                    customPopup.style.display = "block";
+
+                    // const screenPoint = view.toScreen(event.mapPoint);
+                    // // Get the position of the view container relative to the page
+                    // const viewRect = view.container.getBoundingClientRect();
+                    // // Calculate popup position relative to the container
+                    // const padding = 10;
+                    // let left = screenPoint.x + 20;
+                    // let top = screenPoint.y + 20;
+
+                    // // Adjust for view container position
+                    // left += viewRect.left;
+                    // top += viewRect.top;
+
+                    // // Get popup size
+                    // const popupRect = customPopup.getBoundingClientRect();
+
+                    // // Prevent overflow within the view container
+                    // if (left + popupRect.width + padding > viewRect.right) {
+                    //     left = viewRect.right - popupRect.width - padding;
+                    // }
+                    // if (top + popupRect.height + padding > viewRect.bottom) {
+                    //     top = viewRect.bottom - popupRect.height - padding;
+                    // }
+                    // if (left < viewRect.left + padding) {
+                    //     left = viewRect.left + padding;
+                    // }
+                    // if (top < viewRect.top + padding) {
+                    //     top = viewRect.top + padding;
+                    // }
+
+                    // // Apply position
+                    // customPopup.style.left = left + "px";
+                    // customPopup.style.top = top + "px";
+                    // customPopup.style.display = "block";
 
                 } else {
                     customPopup.style.display = "none";
@@ -239,4 +249,28 @@ svgToImg = (svg, target) => {
         target.appendChild(img);
     };
     img.src = "data:image/svg+xml;base64," + btoa(svgData);
+}
+
+
+renderJSONAsTable = (data) => {
+    // create table
+    const table = document.createElement("table");
+
+    Object.entries(data).forEach(([key, value]) => {
+        const row = document.createElement("tr");
+
+        const keyCell = document.createElement("td");
+        keyCell.textContent = key;
+
+        const valueCell = document.createElement("td");
+        valueCell.textContent = value;
+
+        row.appendChild(keyCell);
+        row.appendChild(valueCell);
+        table.appendChild(row);
+    });
+
+    const htmlString = table.outerHTML;
+    table.remove(); // cleanup
+    return htmlString;
 }
