@@ -36,7 +36,8 @@ mapInit = () => {
 
 
         const webmap = new WebMap({
-            portalItem: { id: "c8ae8f6c08d34492b00f939605e2a776" }
+            portalItem: { id: "331d866c026b49e78a8d5ce244d25816" }
+            //portalItem: { id: "c8ae8f6c08d34492b00f939605e2a776" }
         });
 
         const view = new MapView({
@@ -121,33 +122,6 @@ mapInit = () => {
                 layer_div.addEventListener("click", () => {
                     layer.visible = !layer.visible;
                 });
-
-                // const panel = document.createElement("div");
-                // panel.className = "panel";
-
-                // const toggleLink = document.createElement("div");
-                // toggleLink.className = "layer-item";
-                // toggleLink.textContent = layer.visible ? "Hide layer" : "Show layer";
-                // toggleLink.onclick = () => {
-                //     layer.visible = !layer.visible;
-                //     toggleLink.textContent = layer.visible ? "Hide layer" : "Show layer";
-                // };
-                // panel.appendChild(toggleLink);
-
-                // const zoomLink = document.createElement("div");
-                // zoomLink.className = "layer-item";
-                // zoomLink.textContent = "Zoom to layer";
-                // zoomLink.onclick = () => {
-                //     view.goTo(layer.fullExtent).catch(err => console.error(err));
-                // };
-                //panel.appendChild(zoomLink);
-
-                //layerListDiv.appendChild(panel);
-
-                // acc.addEventListener("click", function () {
-                //     this.classList.toggle("active");
-                //     panel.style.display = panel.style.display === "block" ? "none" : "block";
-                // });
             });
         });
 
@@ -172,13 +146,13 @@ mapInit = () => {
                     if (attr_result) {
                         const feature = attr_result.features[0];
                         const attributes = feature.attributes;
-                         const tble = renderJSONAsTable(attributes)
                         view.popup.open({
                             title: "Feature Information",
                             location: event.mapPoint, // Position the pop-up at the click location
-                            content: tble // Function to format the pop-up content
+                            content: createPopupContent(attributes), // Function to format the pop-up content
+                            className: "my-custom-popup"
                         });
-
+                        
 
                        
                         // const content = `
@@ -252,25 +226,13 @@ svgToImg = (svg, target) => {
 }
 
 
-renderJSONAsTable = (data) => {
-    // create table
-    const table = document.createElement("table");
-
-    Object.entries(data).forEach(([key, value]) => {
-        const row = document.createElement("tr");
-
-        const keyCell = document.createElement("td");
-        keyCell.textContent = key;
-
-        const valueCell = document.createElement("td");
-        valueCell.textContent = value;
-
-        row.appendChild(keyCell);
-        row.appendChild(valueCell);
-        table.appendChild(row);
-    });
-
-    const htmlString = table.outerHTML;
-    table.remove(); // cleanup
-    return htmlString;
+ createPopupContent = (attributes) => {
+  let content = "<table>";
+  for (const key in attributes) {
+    if (attributes.hasOwnProperty(key)) {
+      content += `<tr><td><b>${key}</b></td><td>${attributes[key]}</td></tr>`;
+    }
+  }
+  content += "</table>";
+  return content;
 }

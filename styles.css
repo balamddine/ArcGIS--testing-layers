@@ -146,6 +146,12 @@ body {
 calcite-action-bar{
     display: none;
 }
+
+.esri-popup__header-title {
+  font-size: 18px !important;
+  font-weight: bold !important;
+  background-color: #ff5722 !important;
+}
 /*------------Accordion -------------------------*/
 
 .accordion__item {
