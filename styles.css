@@ -11,7 +11,7 @@ body {
 }
 
 #sidePanel {
-    width: 300px;
+    width: 330px;
     background: #f4f4f4;
     overflow-y: auto;
     border-right: 1px solid #ccc;
@@ -49,8 +49,8 @@ body {
     font-size: 14px;
     pointer-events: none;
     display: none;
-    z-index: 1000;
-    white-space: nowrap;
+    z-index: 9999;
+    max-width: 300px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2)
 }
 
@@ -76,6 +76,12 @@ body {
     gap: 8px;
 }
 
+.accordion__content ul {
+    padding: 0px;
+    margin: 0px;
+    list-style: none;
+}
+
 .layer_item {
     display: flex;
     flex-direction: row;
@@ -83,6 +89,7 @@ body {
     align-items: center;
     justify-content: left;
     margin-bottom: 8px;
+    cursor: default;
 }
 
 .layer_item .layer-symbol {
@@ -120,7 +127,7 @@ body {
     font-size: 13px;
     z-index: 1000;
     display: none;
-    margin:0px;
+    margin: 0px;
     padding: 0px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
@@ -141,17 +148,64 @@ body {
 #popupClose {
     cursor: pointer;
     float: right;
-    color:#FFF;
+    color: #FFF;
 }
-calcite-action-bar{
+
+calcite-action-bar {
     display: none;
 }
 
 .esri-popup__header-title {
-  font-size: 18px !important;
-  font-weight: bold !important;
-  background-color: #ff5722 !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    background-color: #ff5722 !important;
 }
+
+#loader {
+    position: absolute;
+    background-color: white;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    z-index: 9999;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#loader .loader_content {
+    display: flex;
+    ;
+    flex-direction: column;
+    align-items: center;
+    justify-content: left;
+}
+
+#loader .loader_content span {
+    font-size: 12px;
+}
+
+.esri-features__container:not(:empty) {
+    padding: 0px;
+}
+
+.esri-feature__content-node {
+    min-height: 200px;
+    padding: 12px;
+    font-size: 13px;
+}
+
+.esri-feature__content-node .popup-header {
+    width: 100%;
+    height: 40px;
+    background-color: #415464;
+}
+.esri-feature__content-node .popup-content {
+  padding: 12px;
+}
+
 /*------------Accordion -------------------------*/
 
 .accordion__item {
@@ -166,13 +220,14 @@ calcite-action-bar{
     padding: 20px 12px;
     margin-bottom: 2px;
     color: white;
-    font-size: 28px;
+    font-size: 16px;
     text-decoration: none;
     background-color: #415464;
     border-radius: 3px;
     -webkit-transition: background-color 0.2s;
     transition: background-color 0.2s;
-    cursor: pointer;
+    cursor: default;
+    align-items: center;
 }
 
 .accordion__item .accordion__title:hover {
@@ -203,7 +258,15 @@ calcite-action-bar{
     -webkit-transition: all 0.2s ease-out;
     transition: all 0.2s ease-out;
 }
-
+.accordion__item .accordion__title .accordion__title-text {
+  flex: 1;               /* takes up remaining space */
+}
+.fa.fa-eye ,.fa-chevron-down{
+    font-size: 14px;
+}
+.accordion-layer-toggle {
+  margin-left: auto;     /* pushes eye to far right */
+}
 .accordion__item .accordion__rotate {
     transform: rotate(225deg);
 }
