@@ -1,27 +1,67 @@
+@font-face {
+    font-family: "Adelphi Pe Variable New";
+    /* Give your font a name */
+    src: url("./fonts/Adelphi-PE-Variable-Text-Thin.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+
 html,
 body {
     height: 100%;
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: "Adelphi Pe Variable New", Sans-serif !important;
 }
+
+h1,
+h2,
+h3 {
+    font-family: "Adelphi Pe Variable New", Sans-serif !important;
+}
+
+
 
 #container {
     display: flex;
+    width: 100%;
     height: 100%;
 }
 
+#viewDiv {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.fullscreenBtn {
+    position: absolute;
+    top: 82px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 #sidePanel {
+
     width: 330px;
     background: #f4f4f4;
     overflow-y: auto;
-    border-right: 1px solid #ccc;
+    /* border-right: 1px solid #ccc; */
     padding: 10px;
-    position: relative;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    height: 94vh;
+    z-index: 4;
+    min-height: 400px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2)
 }
 
-#viewDiv {
-    flex: 1;
-}
+
 
 .accordion {
     cursor: pointer;
@@ -54,6 +94,12 @@ body {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2)
 }
 
+.esri-ui-top-left {
+    left: 360px !important;
+    flex-flow: row !important;
+    gap: 4px;
+}
+
 .esri-attribution {
     display: none;
 }
@@ -76,10 +122,44 @@ body {
     gap: 8px;
 }
 
+.accordion__content {
+    font-family: "Inter", Sans-serif;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
+}
+
 .accordion__content ul {
     padding: 0px;
     margin: 0px;
     list-style: none;
+    cursor: default;
+}
+
+#popup {
+    display: none;
+    background: white;
+    padding: 12px;
+    max-width: 400px;
+    max-height: 300px;
+    z-index: 1;
+    pointer-events: auto;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.2);
+    text-align: left;
+    position: absolute;
+}
+
+
+.popup-content,
+.popup-content a {
+    font-size: 13px;
+    color: #161B1D;
+    line-height: 20px;
+}
+
+.popup-content a {
+    text-decoration: underline;
 }
 
 .layer_item {
@@ -117,39 +197,7 @@ body {
 
 }
 
-.customPopup {
-    position: absolute;
-    background: #FFF;
-    border: 1px solid #fff;
-    min-height: 200px;
-    min-width: 200px;
-    font-family: Arial;
-    font-size: 13px;
-    z-index: 1000;
-    display: none;
-    margin: 0px;
-    padding: 0px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-}
 
-.customPopup .popup_title {
-    padding: 8px 24px;
-    background-color: #415464;
-    min-height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: right;
-}
-
-.customPopup .popup_content {
-    padding: 12px;
-}
-
-#popupClose {
-    cursor: pointer;
-    float: right;
-    color: #FFF;
-}
 
 calcite-action-bar {
     display: none;
@@ -191,20 +239,17 @@ calcite-action-bar {
     padding: 0px;
 }
 
-.esri-feature__content-node {
-    min-height: 200px;
-    padding: 12px;
-    font-size: 13px;
-}
+
 
 .esri-feature__content-node .popup-header {
     width: 100%;
     height: 40px;
     background-color: #415464;
 }
-.esri-feature__content-node .popup-content {
-  padding: 12px;
-}
+
+
+
+
 
 /*------------Accordion -------------------------*/
 
@@ -217,7 +262,7 @@ calcite-action-bar {
     display: flex;
     gap: 6px;
     flex-direction: row;
-    padding: 20px 12px;
+    padding: 13px 16px;
     margin-bottom: 2px;
     color: white;
     font-size: 16px;
@@ -228,16 +273,50 @@ calcite-action-bar {
     transition: background-color 0.2s;
     cursor: default;
     align-items: center;
+    font-family: "Inter", Sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
 }
 
 .accordion__item .accordion__title:hover {
-    background-color: #002247;
     transition: all 0.5s ease-out;
 }
 
-.accordion__item .accordion-active {
-    background-color: #002247;
+.accordion__title.visible {
+    background-color: #405464;
 }
+
+/* .accordion__title.visible:hover{
+    background-color: #A3B8C9;
+} */
+
+.accordion__title.notvisible {
+    background-color: #A3B8C9;
+}
+
+/* .accordion__title.notvisible:hover{
+    background-color: #405464;
+} */
+
+.accordion__title.infrastructure.visible {
+    background-color: #42C3F1;
+}
+
+/* .accordion__title.infrastructure.visible:hover{
+    background-color: #D0F0FB;
+} */
+
+.accordion__title.infrastructure.notvisible {
+    background-color: #D0F0FB;
+}
+
+/* .accordion__title.infrastructure.notvisible:hover{
+    background-color: #42C3F1;
+} */
+
+
 
 .accordion__item .accordion__title .accordion__arrow {
     position: absolute;
@@ -258,15 +337,25 @@ calcite-action-bar {
     -webkit-transition: all 0.2s ease-out;
     transition: all 0.2s ease-out;
 }
+
 .accordion__item .accordion__title .accordion__title-text {
-  flex: 1;               /* takes up remaining space */
+    flex: 1;
+    /* takes up remaining space */
 }
-.fa.fa-eye ,.fa-chevron-down{
-    font-size: 14px;
+
+.fa-eye,
+.fa-eye-slash,
+.fa-chevron-right,
+.fa-chevron-down {
+    font-size: 12px;
 }
-.accordion-layer-toggle {
-  margin-left: auto;     /* pushes eye to far right */
+
+.accordion-layer-toggle,.sub-layer-toggle {
+    margin-left: auto;
+    cursor: pointer;
+    /* pushes eye to far right */
 }
+
 .accordion__item .accordion__rotate {
     transform: rotate(225deg);
 }
@@ -281,5 +370,106 @@ calcite-action-bar {
 .accordion__item .accordion__arrow-item {
     font-weight: 700;
 }
+.esri-widget--button{
+  width: 40px !important;   /* default is 32px */
+  height: 40px !important;
+  font-size: 18px !important;
+
+}
+/*-------------------------------------*/
+
+/*-------------- Modal ---------------------*/
+
+.modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Black with opacity */
+}
+
+/* Modal content */
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 4px;
+    width: 400px;
+    max-width: 90%;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-content .content {
+    font-size: 14px;
+}
+
+.modal-content h2 {
+    font-size: 24px;
+    color: #405464;
+}
+
+#btnHowTo {
+    border: 1px solid transparent !important;
+}
+
+/* .button_actions {
+    position: absolute;
+    top: 129px;
+    right: 15px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.button_actions button {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    border: 1px solid transparent;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    color: #151515;
+
+} 
+
+.button_actions button:hover {
+
+    background-color: rgb(243, 243, 243);
+}
+*/
+
+/* Close button */
+.modal-close {
+    color: #aaa;
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    color: #000;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 
 /*-------------------------------------*/
