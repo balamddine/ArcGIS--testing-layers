@@ -47,7 +47,7 @@ h3 {
 
 #sidePanel {
 
-    width: 330px;
+    width: 415px;
     background: #f4f4f4;
     overflow-y: auto;
     /* border-right: 1px solid #ccc; */
@@ -55,9 +55,9 @@ h3 {
     position: absolute;
     top: 15px;
     left: 15px;
-    height: 94vh;
     z-index: 4;
-    min-height: 400px;
+    min-height: 300px;
+    max-height: 92vh;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2)
 }
 
@@ -95,7 +95,7 @@ h3 {
 }
 
 .esri-ui-top-left {
-    left: 360px !important;
+    left: 450px !important;
     flex-flow: row !important;
     gap: 4px;
 }
@@ -164,7 +164,7 @@ h3 {
 
 .layer_item {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 8px;
     align-items: center;
     justify-content: left;
@@ -172,19 +172,36 @@ h3 {
     cursor: default;
 }
 
-.layer_item .layer-symbol {
-    flex: 0 0 auto;
-    width: 24px;
-    height: 24px;
+.layer_row {
+    width: 100%;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
 }
 
-.layer_item .layer-symbol img {
+.layer_item .layer-symbol {
+    order: -1;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    width: 32px;
+    height: 32px;
+    /* background-color: white;
+    filter: drop-shadow(3px 0px 3px rgba(0, 0, 0, 0.3));
+    border-radius: 6px;  */
+    transition: all 0.3s ease;
+    /* smooth transition */
+}
 
-    max-height: 100%;
+.layer_item .layer-symbol:hover {
+    transform: scale(1.1);
+    /* background-color: #f0f0f0; 
+    filter: drop-shadow(4px 2px 6px rgba(0, 0, 0, 0.4));  */
+}
+
+.layer_item .layer-symbol img,
+.layer_item .legend-symbol img {
+    width: 100%;
+    max-height: 32px;
     object-fit: contain;
 }
 
@@ -194,10 +211,43 @@ h3 {
     overflow: hidden;
     text-overflow: ellipsis;
     background: none;
-
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: left;
 }
 
+.legend-symbols {
+    width: 100%;
+    margin-left: 20px;
+    flex-direction: column;
+    gap: 8px;
+    display: none;
+}
 
+.legend-symbols.show {
+     display: flex;
+}
+
+.legend-symbols .legend-symbol {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    gap: 12px;
+}
+
+.content-header {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    gap: 12px;
+}
+
+.content-header img {
+    height: 32px;
+    object-fit: contain;
+    width: 100%;
+}
 
 calcite-action-bar {
     display: none;
@@ -288,34 +338,44 @@ calcite-action-bar {
     background-color: #405464;
 }
 
-/* .accordion__title.visible:hover{
-    background-color: #A3B8C9;
-} */
 
 .accordion__title.notvisible {
     background-color: #A3B8C9;
 }
 
-/* .accordion__title.notvisible:hover{
-    background-color: #405464;
-} */
 
 .accordion__title.infrastructure.visible {
     background-color: #42C3F1;
 }
 
-/* .accordion__title.infrastructure.visible:hover{
-    background-color: #D0F0FB;
-} */
-
 .accordion__title.infrastructure.notvisible {
     background-color: #D0F0FB;
 }
 
-/* .accordion__title.infrastructure.notvisible:hover{
-    background-color: #42C3F1;
-} */
 
+.accordion__title.jurisdictions.visible {
+    background-color: #0AADAB;
+}
+
+.accordion__title.facilities.visible {
+    background-color: #3C91AF;
+}
+
+.accordion__title.roads.visible {
+    background-color: #C45F31;
+}
+
+.accordion__title.power.visible {
+    background-color: #CE9B0D;
+}
+
+.accordion__title.pipelines.visible {
+    background-color: #767676;
+}
+
+.accordion__title.sequestration.visible {
+    background-color: #344451;
+}
 
 
 .accordion__item .accordion__title .accordion__arrow {
@@ -345,12 +405,18 @@ calcite-action-bar {
 
 .fa-eye,
 .fa-eye-slash,
+.fa-bell,
+.fa-bell-slash,
+.fa-tag,
+.fa-tag-slash,
 .fa-chevron-right,
 .fa-chevron-down {
     font-size: 12px;
 }
 
-.accordion-layer-toggle,.sub-layer-toggle {
+.accordion-layer-toggle,
+.sub-layer-toggle,
+.symbol-layer-toggle {
     margin-left: auto;
     cursor: pointer;
     /* pushes eye to far right */
@@ -370,12 +436,15 @@ calcite-action-bar {
 .accordion__item .accordion__arrow-item {
     font-weight: 700;
 }
-.esri-widget--button{
-  width: 40px !important;   /* default is 32px */
-  height: 40px !important;
-  font-size: 18px !important;
+
+.esri-widget--button {
+    width: 40px !important;
+    /* default is 32px */
+    height: 40px !important;
+    font-size: 18px !important;
 
 }
+
 /*-------------------------------------*/
 
 /*-------------- Modal ---------------------*/
@@ -473,3 +542,12 @@ calcite-action-bar {
 
 
 /*-------------------------------------*/
+
+.ui-tooltip {
+    padding: 6px;
+    background-color: #cccccc;
+    color: white;
+    border-radius: 4px;
+    font-size: 11px;
+    box-shadow: none !important;
+}
