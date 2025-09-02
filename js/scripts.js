@@ -46,9 +46,9 @@ const mapInit = () => {
                 }
             }
         });
-
+        const control_position = isMobile() ? "bottom-right" : "top-left"
         // add zoom button
-        view.ui.move("zoom", "top-left");
+        view.ui.move("zoom", control_position);
 
         // add full screen button
         const container = document.getElementById("container");
@@ -56,7 +56,7 @@ const mapInit = () => {
             view: view,
             element: container
         });
-        view.ui.add(fullscreen, "top-left");
+        view.ui.add(fullscreen, control_position);
 
         // add Base map gallery
         const basemapGallery = new BasemapGallery({
@@ -77,11 +77,11 @@ const mapInit = () => {
             content: basemapGallery,
             expandIcon: "basemap" // icon shown on expand button
         });
-        view.ui.add(bgExpand, "top-left");
+        view.ui.add(bgExpand, control_position);
 
         // add howto text
         const howToButton = document.getElementById("btnHowTo")
-        view.ui.add(howToButton, "top-left");
+        view.ui.add(howToButton, control_position);
 
 
         webmap.when(async () => {
@@ -132,7 +132,8 @@ const popupLogic = (view) => {
                 const mapPoint = event.mapPoint;
                 const attributes = feature.attributes;
                 const popupTitle = createPopupTitle(attributes, layerName);
-                const content = `${createPopupContent(attributes)}` || "No data available...";
+                const fields = layer.fields;
+                const content = `${createPopupContent(attributes, fields)}` || "No data available...";
                 view.popup.open({
                     title: popupTitle,
                     content: content,
@@ -141,6 +142,18 @@ const popupLogic = (view) => {
 
             }
 
+        }
+    });
+
+    view.on("pointer-move", async (event) => {
+        const hitTest = await view.hitTest(event);
+        const layerResults = hitTest.results.filter(r => r.graphic && r.graphic.layer);
+        if (layerResults.length > 0) {
+            // Mouse is over a feature -> show pointer
+            view.container.style.cursor = "pointer";
+        } else {
+            // Default cursor
+            view.container.style.cursor = "default";
         }
     });
 
@@ -203,11 +216,12 @@ const addLayerAccordion = async (layer, symbolUtils, index, excel_data) => {
     // }
 
     if (layer.type === "group" && layer.layers) {
-        const loadedSublayers = await Promise.all(
+        let loadedSublayers = await Promise.all(
             layer.layers.map(s => s.load().then(() => s))
         );
+        loadedSublayers = loadedSublayers.reverse();
         //accordion__title.classList.remove("no_expand");
-        accordion__title.innerHTML = `<i class="fa fa-chevron-right toggle-down"></i><span class="accordion__title-text">${layer.title}</span>`;
+        accordion__title.innerHTML = `<i class="fa fa-chevron-right"></i><span class="accordion__title-text">${layer.title}</span>`;
 
         const toggleDiv = document.createElement("div");
         toggleDiv.className = "accordion-layer-toggle";
@@ -263,30 +277,24 @@ const addLayerAccordion = async (layer, symbolUtils, index, excel_data) => {
         //     accordion__title.classList.add("no_expand")
         // }
         // if (layer.title != "Key Infrastructure") {
-
+        const is_keyInfra = layer.title == "Key Infrastructure"
         const labelClass = getLabelOption();
 
         for (const subLayer of loadedSublayers) {
             subLayer.labelingInfo = [labelClass];
             const li = document.createElement("li");
-            li.className = "layer_item";
+            li.className = `layer_item ${is_keyInfra ? "noMarg" : ""}`;
             const rowDiv = document.createElement("div");
-            rowDiv.className = "layer_row";
+            rowDiv.className = `layer_row ${is_keyInfra ? "hide" : ""}`;
             const titleDiv = document.createElement("div");
             titleDiv.className = "layer_title";
 
 
             const span_title = document.createElement("span");
             span_title.textContent = subLayer.title;
+            span_title.title = subLayer.title;
             titleDiv.appendChild(span_title);
             rowDiv.appendChild(titleDiv);
-
-
-
-
-
-
-
 
             const toggle_sublayerDiv = document.createElement("div");
             toggle_sublayerDiv.id = `sub-layer-toggle_${subLayer.id}`
@@ -306,7 +314,7 @@ const addLayerAccordion = async (layer, symbolUtils, index, excel_data) => {
             li.appendChild(rowDiv);
 
 
-            const symbolsListDiv = await createSymbols(subLayer, titleDiv, symbolUtils)
+            const symbolsListDiv = await createSymbols(subLayer, titleDiv, symbolUtils, is_keyInfra)
             if (symbolsListDiv) {
                 li.appendChild(symbolsListDiv);
             }
@@ -329,7 +337,7 @@ const addLayerAccordion = async (layer, symbolUtils, index, excel_data) => {
 }
 
 
-const createSymbols = async (subLayer, titleDiv, symbolUtils) => {
+const createSymbols = async (subLayer, titleDiv, symbolUtils, is_keyInfra) => {
 
     const renderer = subLayer.renderer;
     const symbolDiv = document.createElement("div");
@@ -343,6 +351,7 @@ const createSymbols = async (subLayer, titleDiv, symbolUtils) => {
 
     if (previewSymbol) {
         const svgNode = await symbolUtils.renderPreviewHTML(previewSymbol, { size: 20 });
+
         symbolDiv.append(svgNode);
     }
     titleDiv.append(symbolDiv)
@@ -350,7 +359,7 @@ const createSymbols = async (subLayer, titleDiv, symbolUtils) => {
 
     // --- Symbols List (hidden initially) ---
     const symbolsList = document.createElement("div");
-    symbolsList.className = "legend-symbols";
+    symbolsList.className = `legend-symbols ${is_keyInfra ? "show noMarg" : ""}`;
 
     let renderedInfoList = []
     if (renderer.type === "unique-value") {
@@ -359,10 +368,15 @@ const createSymbols = async (subLayer, titleDiv, symbolUtils) => {
     else if (renderer.type === "class-breaks") {
         renderedInfoList = renderer.classBreakInfos
     }
-
+    renderedInfoList = renderedInfoList.reverse();
     if (renderedInfoList.length > 0) {
         symbolDiv.title = "Click to expand";
-
+        symbolDiv.innerHTML = "";
+        const chevron_icon = document.createElement("i");
+        chevron_icon.classList.add("fa");
+        chevron_icon.classList.add("fa-chevron-right");
+        symbolDiv.append(chevron_icon);
+        titleDiv.classList.add("chevron_exists")
         const hiddenValues = new Set();
         for (const info of renderedInfoList) {
             const item = document.createElement("div");
@@ -374,42 +388,69 @@ const createSymbols = async (subLayer, titleDiv, symbolUtils) => {
             layer_symbolDiv.append(svgNode);
             item.append(layer_symbolDiv);
 
-            const text = document.createElement("span");
-            text.textContent = info.label;
-            item.append(text);
+            const span_text = document.createElement("span");
+            span_text.textContent = info.label;
+            span_text.title = info.label;
+            item.append(span_text);
 
 
-            const symboltoggleDiv = document.createElement("div");
-            symboltoggleDiv.className = "symbol-layer-toggle";
-            symboltoggleDiv.title = "show/hide layer";
-            symboltoggleDiv.innerHTML = `<i class="fa fa-eye"></i>`;
-            item.append(symboltoggleDiv);
+            // const symboltoggleDiv = document.createElement("div");
+            // symboltoggleDiv.className = "symbol-layer-toggle";
+            // symboltoggleDiv.title = "show/hide layer";
+            // symboltoggleDiv.innerHTML = `<i class="fa fa-eye"></i>`;
+            // item.append(symboltoggleDiv);
 
-            symbolsList.append(item);
+            // symbolsList.append(item);
 
-            // Click handler to hide/show only features with this value
-            symboltoggleDiv.addEventListener("click", () => {
-                if (hiddenValues.has(info.value)) {
-                    hiddenValues.delete(info.value);
-                    symboltoggleDiv.innerHTML = `<i class="fa fa-eye"></i>`;
-                } else {
-                    hiddenValues.add(info.value);
-                    symboltoggleDiv.innerHTML = `<i class="fa fa-eye-slash"></i>`;
-                }
+            // // Click handler to hide/show only features with this value
+            // symboltoggleDiv.addEventListener("click", () => {
+            //     if (hiddenValues.has(info.value)) {
+            //         hiddenValues.delete(info.value);
+            //         symboltoggleDiv.innerHTML = `<i class="fa fa-eye"></i>`;
+            //     } else {
+            //         hiddenValues.add(info.value);
+            //         symboltoggleDiv.innerHTML = `<i class="fa fa-eye-slash"></i>`;
+            //     }
 
-                // Build a definition expression excluding hidden values
-                const where = hiddenValues.size > 0
-                    ? `${renderer.field} NOT IN ('${Array.from(hiddenValues).join("','")}')`
-                    : "1=1"; // show all if none hidden
+            //     // Build a definition expression excluding hidden values
+            //     const where = hiddenValues.size > 0
+            //         ? `${renderer.field} NOT IN ('${Array.from(hiddenValues).join("','")}')`
+            //         : "1=1"; // show all if none hidden
 
-                subLayer.definitionExpression = where;
-            });
+            //     subLayer.definitionExpression = where;
+            // });
 
             symbolsList.append(item);
 
         }
-        symbolDiv.addEventListener("click", () => {
-            symbolsList.classList.toggle("show");
+        titleDiv.addEventListener("click", (e) => {
+
+            e.preventDefault();
+            const $title = $(e.currentTarget);
+            const $icon = $title.find("i")
+            const $content = $title.parent().parent().find(".legend-symbols");
+
+
+            if ($title.hasClass("accordion-active")) {
+                // If already active, just close it
+                $title.removeClass("accordion-active");
+                $icon.removeClass("fa-chevron-down").addClass("fa-chevron-right");
+                $content.slideUp(400);
+            } else {
+                // Close all others first
+                $(".legend-symbols").slideUp(400);
+                $(".layer_title.chevron_exists").removeClass("accordion-active");
+                $icon.removeClass("fa-chevron-down").addClass("fa-chevron-right");
+
+                // Open the clicked one
+                $title.addClass("accordion-active");
+                $icon.removeClass("fa-chevron-right").addClass("fa-chevron-down");
+                $content.slideDown(400);
+            }
+
+
+
+            //symbolsList.classList.toggle("show");
         });
     }
 
@@ -471,8 +512,8 @@ const getLabelOption = () => {
 }
 
 const accordionInit = () => {
-    $(".accordion__title .toggle-down").on("click", function (e) {
-        var $title = $(this).parent();
+    $(".accordion__title").on("click", function (e) {
+        var $title = $(this);
 
         if ($title.hasClass("no_expand")) {
             return;
@@ -481,7 +522,7 @@ const accordionInit = () => {
         e.preventDefault();
 
         const $content = $title.next(".accordion__content");
-        const $icon = $(this);
+        const $icon = $(this).find("i");
 
         if ($title.hasClass("accordion-active")) {
             // If already active, just close it
@@ -492,10 +533,7 @@ const accordionInit = () => {
             // Close all others first
             $(".accordion__content").slideUp(400);
             $(".accordion__title").removeClass("accordion-active");
-            $(".accordion__title .toggle-down")
-                .removeClass("fa-chevron-down")
-                .addClass("fa-chevron-right");
-
+            $icon.removeClass("fa-chevron-down").addClass("fa-chevron-right");
             // Open the clicked one
             $title.addClass("accordion-active");
             $icon.removeClass("fa-chevron-right").addClass("fa-chevron-down");
@@ -522,10 +560,14 @@ const createPopupContent = (attributes) => {
         content = `${transformHyperlink(attributes["Content"])} ${attributes.hasOwnProperty("Link") && attributes["Link"] ? `<div class='moreInfo'><strong>For more information refer to:</strong> ${attributes["Link"]}</div>` : ""}`
     }
     else {
+
         content = "<table class='esri-widget__table'>"
         for (const key in attributes) {
+
             if (attributes.hasOwnProperty(key) && key != "OBJECTID") {
-                content += `<tr><th class='esri-feature-fields__field-header'>${key}</th><td class='esri-feature-fields__field-data'>${attributes[key]}</td></tr>`;
+                const field = fields.find(f => f.name === key);
+                const alias = field ? field.alias : key;
+                content += `<tr><th class='esri-feature-fields__field-header'>${alias}</th><td class='esri-feature-fields__field-data'>${attributes[key]}</td></tr>`;
 
             }
         }
@@ -605,4 +647,10 @@ const readExcelFromUrl = async () => {
     } catch (error) {
         console.error(error);
     }
+}
+
+const isMobile = () => {
+    return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+    );
 }
